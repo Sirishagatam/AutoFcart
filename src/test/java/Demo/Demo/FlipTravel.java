@@ -3,6 +3,7 @@ package Demo.Demo;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class FlipTravel {
 		driver=new ChromeDriver();
 		driver.manage().window().maximize();
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-		wait=new WebDriverWait(driver,Duration.ofSeconds(100));
+		wait=new WebDriverWait(driver,Duration.ofSeconds(60));
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		
 		driver.get("https://www.flipkart.in");
@@ -48,6 +49,8 @@ public class FlipTravel {
 	    //Select Departure Date
 	    dateSetter("JUNE",25,"0-datefrom");
 
+	    Thread.sleep(1000);
+	    
 	    //Select Return Date
 	    dateSetter("OCTOBER",29,"0-dateto");
 	    
@@ -61,9 +64,61 @@ public class FlipTravel {
 	    WebElement tc=driver.findElement(By.xpath("//input[@name='0-travellerclasscount']"));
 	    tc.click();
 	    
+	    //Passenger list
 	    travelcount("increase",2,"adult");
 	    travelcount("increase",3,"child");
 	    travelcount("increase",1,"infant");
+	    
+	    //Passenger count
+	    WebElement tcount=driver.findElement(By.xpath("//input[@name=\"0-travellerclasscount\"]"));
+	    String tv=tcount.getAttribute("value");
+	    System.out.println("Total no of passenger count is: "+tv);
+	    
+	    //Click on Done after selecting passenger count
+	    driver.findElement(By.xpath("//button[@class=\"xSWdQ- azBkHf\"]")).click();
+
+	    //Click on Search
+	    driver.findElement(By.xpath("//span[text()=\"SEARCH\"]")).click();
+	    
+	    //Click on Non-stop option
+	    wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("(//div[@class=\"XqNaEv YR+rMk\"])[1]"))).click();
+	    	    
+	    //Fetch the price of all flights displayed
+	    List<WebElement> lt=driver.findElements(By.xpath("//div[@class=\"_44X-Hx\"]"));
+	    ArrayList<String> alt=new ArrayList<>(lt.size());
+	    
+	    int pr=lt.size();
+	    int hv=pr/2;
+	    System.out.println("No of flights for selected date is:"+pr);
+	    
+	    int z=0;
+	    for(WebElement x:lt) {
+	    	System.out.println("Price of flight no "+z+"displayed is: "+x.getText());
+	    	alt.add(x.getText());
+	    	z++;
+	    }
+	    
+	    z=1;
+	    
+	    System.out.println("################ Flights displayed for the Selected date is: ###############\n");
+	    for(int c=0,d=hv;c<hv&&d<pr;c++,d++) {
+	    	System.out.println("Price for Departure flight "+z+" listed in search is: "+alt.get(c));
+	    	System.out.println("\tPrice for Arrival flight "+z+" listed in search is: "+alt.get(d));
+	    	z++;
+	    }
+	    
+	    String fprice=driver.findElement(By.xpath("//div[@class=\"nQP1vT\"]//span[@class=\"Wazafo\"]")).getText();
+	    System.out.println("\n");
+	    System.out.println("## Price of light displayed at bottom is: "+fprice+" ##\n");
+	    
+	    Thread.sleep(2000);
+	    wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[text()=\"Book\"]"))).click();
+	    System.out.println("Clicked on Booking option\n");
+	    
+	  	Thread.sleep(1000);
+	  
+	  	//Close the Login option
+	  	wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//button[@class=\"QqFHMw gtm1So\"]"))).click();
 	    
 	    //driver.quit();
 	}
@@ -130,7 +185,11 @@ public class FlipTravel {
 		WebElement trav=driver.findElement(By.xpath("(//*[local-name()='svg' and @viewBox=\"" + ibox + "\"]/*[local-name()='path'])[" + no + "]"));
 			
 	    for (int i=1;i<=ct;i++) {
+	    	if(people=="adult" && i==1) {
+	    		System.out.println("one adult passenger selected by default\n");
+	    	} else {
 	    		trav.click();
+	    	}
 	    }
 		
 	}
